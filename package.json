@@ -1,0 +1,40 @@
+{
+  "author": "Shaun Hamilton",
+  "bugs": {
+    "url": "https://github.com/ShaunSHamilton/babeliser/issues"
+  },
+  "dependencies": {
+    "@babel/parser": "7.19.3"
+  },
+  "description": "A blazingly brilliant code parser for testing JavaScript code",
+  "devDependencies": {
+    "@babel/types": "7.19.3",
+    "@types/chai": "4.3.3",
+    "chai": "4.3.6",
+    "esbuild": "0.15.10",
+    "typescript": "4.8.4"
+  },
+  "homepage": "https://github.com/ShaunSHamilton/babeliser#readme",
+  "keywords": [
+    "babel",
+    "js",
+    "node",
+    "nodejs"
+  ],
+  "license": "MIT",
+  "main": "./lib/index.js",
+  "name": "babeliser",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShaunSHamilton/babeliser.git"
+  },
+  "scripts": {
+    "build": "esbuild --tsconfig=tsconfig.json --platform=neutral --main-fields=main --bundle --minify --outdir=lib src/index.ts && npx tsc",
+    "prepub": "npm run build",
+    "pub": "npm publish",
+    "test": "esbuild --tsconfig=tsconfig.json --platform=neutral --external:@babel/parser --external:chai --bundle --outdir=temp-test test/index.ts && node temp-test/index.js"
+  },
+  "type": "module",
+  "types": "lib/index.d.ts",
+  "version": "0.1.0"
+}
