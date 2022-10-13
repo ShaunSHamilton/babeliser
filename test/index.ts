@@ -2,7 +2,7 @@ const jsString = `
 const a = 1;
 let b = 2;
 var c = 3;
-log(a + b + c);
+console.log(a + b + c);
 
 function add(param1, param2) {
   const tot = param1 + param2;
@@ -22,7 +22,17 @@ const complexType = {
   }
 }`;
 
-import { identifier, memberExpression } from "@babel/types";
+import {
+  assertBinaryExpression,
+  assertCallExpression,
+  assertFunctionDeclaration,
+  assertIdentifier,
+  assertMemberExpression,
+  assertNumericLiteral,
+  assertReturnStatement,
+  assertVariableDeclaration,
+  assertVariableDeclarator,
+} from "@babel/types";
 import { assert } from "chai";
 import { Babeliser } from "../src/index";
 
@@ -37,60 +47,155 @@ assert.equal(
     .filter((v) => v.scope.join() === "global,complexType,e").length,
   1
 );
-assert.equal(
-  t.getVariableDeclarations().find((v) => v.declarations?.[0]?.id?.name === "a")
-    ?.declarations?.[0]?.init?.value,
-  1
-);
-assert.equal(
-  t.getVariableDeclarations().find((v) => v.declarations?.[0]?.id?.name === "b")
-    ?.declarations?.[0]?.init?.value,
-  2
-);
-assert.equal(
-  t.getVariableDeclarations().find((v) => v.declarations?.[0]?.id?.name === "c")
-    ?.declarations?.[0]?.init?.value,
-  3
-);
-assert.equal(
-  t
-    .getVariableDeclarations()
-    .find((v) => v.declarations?.[0]?.id?.name === "inner")?.declarations?.[0]
-    ?.init?.value,
-  24
-);
+
+const aVariableDeclaration = t.getVariableDeclarations().find((v) => {
+  const variableDeclarator = v.declarations[0];
+  assertVariableDeclarator(variableDeclarator);
+  const identifier = variableDeclarator.id;
+  assertIdentifier(identifier);
+  return identifier.name === "a";
+});
+assertVariableDeclaration(aVariableDeclaration);
+assert.equal(aVariableDeclaration.kind, "const");
+assert.equal(aVariableDeclaration.scope.join(), "global");
+const aNumericLiteral = aVariableDeclaration.declarations[0].init;
+assertNumericLiteral(aNumericLiteral);
+assert.equal(aNumericLiteral.value, 1);
+
+const bVariableDeclaration = t.getVariableDeclarations().find((v) => {
+  const variableDeclarator = v.declarations[0];
+  assertVariableDeclarator(variableDeclarator);
+  const identifier = variableDeclarator.id;
+  assertIdentifier(identifier);
+  return identifier.name === "b";
+});
+assertVariableDeclaration(bVariableDeclaration);
+assert.equal(bVariableDeclaration.kind, "let");
+assert.equal(bVariableDeclaration.scope.join(), "global");
+const bNumericLiteral = bVariableDeclaration.declarations[0].init;
+assertNumericLiteral(bNumericLiteral);
+assert.equal(bNumericLiteral.value, 2);
+
+const cVariableDeclaration = t.getVariableDeclarations().find((v) => {
+  const variableDeclarator = v.declarations[0];
+  assertVariableDeclarator(variableDeclarator);
+  const identifier = variableDeclarator.id;
+  assertIdentifier(identifier);
+  return identifier.name === "c";
+});
+assertVariableDeclaration(cVariableDeclaration);
+assert.equal(cVariableDeclaration.kind, "var");
+assert.equal(cVariableDeclaration.scope.join(), "global");
+const cNumericLiteral = cVariableDeclaration.declarations[0].init;
+assertNumericLiteral(cNumericLiteral);
+assert.equal(cNumericLiteral.value, 3);
+
+const complexTypeVariableDeclaration = t.getVariableDeclarations().find((v) => {
+  const variableDeclarator = v.declarations[0];
+  assertVariableDeclarator(variableDeclarator);
+  const identifier = variableDeclarator.id;
+  assertIdentifier(identifier);
+  return identifier.name === "complexType";
+});
+assertVariableDeclaration(complexTypeVariableDeclaration);
+assert.equal(complexTypeVariableDeclaration.kind, "const");
+assert.equal(complexTypeVariableDeclaration.scope.join(), "global");
+
+const innerVariableDeclaration = t.getVariableDeclarations().find((v) => {
+  const variableDeclarator = v.declarations[0];
+  assertVariableDeclarator(variableDeclarator);
+  const identifier = variableDeclarator.id;
+  assertIdentifier(identifier);
+  return identifier.name === "inner";
+});
+assertVariableDeclaration(innerVariableDeclaration);
+assert.equal(innerVariableDeclaration.kind, "const");
+assert.equal(innerVariableDeclaration.scope.join(), "global,complexType,e");
+const innerNumericLiteral = innerVariableDeclaration.declarations[0].init;
+assertNumericLiteral(innerNumericLiteral);
+assert.equal(innerNumericLiteral.value, 24);
 
 // EXPRESSION STATEMENTS
 
 assert.equal(t.getExpressionStatements().length, 2);
 
 const consoleExpression = t.getExpressionStatements().find((e) => {
-  const identifier = e.expression?.callee;
-  return identifier.name === "log";
+  const callExpression = e.expression;
+  assertCallExpression(callExpression);
+  const memberExpression = callExpression.callee;
+  assertMemberExpression(memberExpression);
+  const object = memberExpression.object;
+  assertIdentifier(object);
+  const property = memberExpression.property;
+  assertIdentifier(property);
+  return object.name === "console" && property.name === "log";
 });
-const binaryExpression = consoleExpression?.expression?.arguments?.[0];
-assert.equal(binaryExpression?.left?.left?.name, "a");
-assert.equal(binaryExpression?.left?.right?.name, "b");
-assert.equal(binaryExpression?.right?.name, "c");
 
-const addExpression = t.getExpressionStatements()[1];
-assert.equal(addExpression.expression?.callee?.name, "add");
-assert.equal(addExpression.expression?.arguments?.[0]?.name, "a");
-assert.equal(addExpression.expression?.arguments?.[1]?.name, "b");
+const consoleCallExpression = consoleExpression?.expression;
+assertCallExpression(consoleCallExpression);
+const binaryExpression = assertCallExpression.arguments[0];
+assert.equal(binaryExpression.left.left.name, "a");
+assert.equal(binaryExpression.left.right.name, "b");
+assert.equal(binaryExpression.right.name, "c");
+
+const addExpression = t.getExpressionStatements().find((e) => {
+  const callExpression = e.expression;
+  assertCallExpression(callExpression);
+  const calleeIdentifier = callExpression.callee;
+  assertIdentifier(calleeIdentifier);
+  return calleeIdentifier.name === "add";
+});
+const addCallExpression = addExpression?.expression;
+assertCallExpression(addCallExpression);
+const addCalleeIdentifier = addCallExpression.callee;
+assertIdentifier(addCalleeIdentifier);
+assert.equal(addCalleeIdentifier.name, "add");
+const addArguments = addCallExpression.arguments;
+const addArgOneIdentifier = addArguments[0];
+assertIdentifier(addArgOneIdentifier);
+assert.equal(addArgOneIdentifier.name, "a");
+const addArgTwoIdentifier = addArguments[1];
+assertIdentifier(addArgTwoIdentifier);
+assert.equal(addArgTwoIdentifier.name, "b");
 
 // FUNCTION DECLARATIONS
 
 assert.equal(t.getFunctionDeclarations().length, 1);
 
-const addFunction = t.getFunctionDeclarations()[0];
-assert.equal(addFunction.id?.name, "add");
-assert.equal(addFunction.params?.[0]?.name, "param1");
-assert.equal(addFunction.params?.[1]?.name, "param2");
+const addFunction = t.getFunctionDeclarations().find((f) => {
+  return f.id?.name === "add";
+});
+assertFunctionDeclaration(addFunction);
+assert.exists(addFunction);
+const addFunctionParams = addFunction.params;
+assert.equal(addFunctionParams.length, 2);
+const addFunctionParamOne = addFunctionParams[0];
+assertIdentifier(addFunctionParamOne);
+assert.equal(addFunctionParamOne.name, "param1");
+const addFunctionParamTwo = addFunctionParams[1];
+assertIdentifier(addFunctionParamTwo);
+assert.equal(addFunctionParamTwo.name, "param2");
 
-const totVariable = addFunction.body?.body?.[0];
-assert.equal(totVariable?.declarations?.[0]?.id?.name, "tot");
-assert.equal(totVariable?.declarations?.[0]?.init?.left?.name, "param1");
-assert.equal(totVariable?.declarations?.[0]?.init?.right?.name, "param2");
+const totVariable = addFunction.body.body[0];
+assertVariableDeclaration(totVariable);
+const totVariableDeclarator = totVariable.declarations[0];
+assertVariableDeclarator(totVariableDeclarator);
+const totIdentifier = totVariableDeclarator.id;
+assertIdentifier(totIdentifier);
+assert.equal(totIdentifier.name, "tot");
+const totBinaryExpression = totVariableDeclarator.init;
+assertBinaryExpression(totBinaryExpression);
+const totBinaryLeftIdentifier = totBinaryExpression.left;
+assertIdentifier(totBinaryLeftIdentifier);
+assert.equal(totBinaryLeftIdentifier.name, "param1");
+const totBinaryRightIdentifier = totBinaryExpression.right;
+assertIdentifier(totBinaryRightIdentifier);
+assert.equal(totBinaryRightIdentifier.name, "param2");
 
-const returnStatement = addFunction.body?.body?.[1];
-assert.equal(returnStatement?.argument?.name, "tot");
+const returnStatement = addFunction.body.body.find((b) => {
+  return b.type === "ReturnStatement";
+});
+assertReturnStatement(returnStatement);
+const returnStatementArgument = returnStatement.argument;
+assertIdentifier(returnStatementArgument);
+assert.equal(returnStatementArgument.name, "tot");
