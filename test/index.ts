@@ -22,6 +22,7 @@ const complexType = {
   }
 }`;
 
+import { identifier, memberExpression } from "@babel/types";
 import { assert } from "chai";
 import { Babeliser } from "../src/index";
 
@@ -58,3 +59,38 @@ assert.equal(
     ?.init?.value,
   24
 );
+
+// EXPRESSION STATEMENTS
+
+assert.equal(t.getExpressionStatements().length, 2);
+
+const consoleExpression = t.getExpressionStatements().find((e) => {
+  const identifier = e.expression?.callee;
+  return identifier.name === "log";
+});
+const binaryExpression = consoleExpression?.expression?.arguments?.[0];
+assert.equal(binaryExpression?.left?.left?.name, "a");
+assert.equal(binaryExpression?.left?.right?.name, "b");
+assert.equal(binaryExpression?.right?.name, "c");
+
+const addExpression = t.getExpressionStatements()[1];
+assert.equal(addExpression.expression?.callee?.name, "add");
+assert.equal(addExpression.expression?.arguments?.[0]?.name, "a");
+assert.equal(addExpression.expression?.arguments?.[1]?.name, "b");
+
+// FUNCTION DECLARATIONS
+
+assert.equal(t.getFunctionDeclarations().length, 1);
+
+const addFunction = t.getFunctionDeclarations()[0];
+assert.equal(addFunction.id?.name, "add");
+assert.equal(addFunction.params?.[0]?.name, "param1");
+assert.equal(addFunction.params?.[1]?.name, "param2");
+
+const totVariable = addFunction.body?.body?.[0];
+assert.equal(totVariable?.declarations?.[0]?.id?.name, "tot");
+assert.equal(totVariable?.declarations?.[0]?.init?.left?.name, "param1");
+assert.equal(totVariable?.declarations?.[0]?.init?.right?.name, "param2");
+
+const returnStatement = addFunction.body?.body?.[1];
+assert.equal(returnStatement?.argument?.name, "tot");

@@ -1,5 +1,10 @@
 import { parse } from "@babel/parser";
-import { Identifier, VariableDeclaration } from "@babel/types";
+import {
+  ExpressionStatement,
+  FunctionDeclaration,
+  Identifier,
+  VariableDeclaration,
+} from "@babel/types";
 
 type Scope = Array<string>;
 
@@ -17,6 +22,22 @@ export class Babeliser {
       VariableDeclaration & { scope: Scope }
     >("VariableDeclaration");
     return variableDeclarations;
+  }
+  public getFunctionDeclarations(): Array<
+    FunctionDeclaration & { scope: Scope }
+  > {
+    const functionDeclarations = this._recurseBodiesForType<
+      FunctionDeclaration & { scope: Scope }
+    >("FunctionDeclaration");
+    return functionDeclarations;
+  }
+  public getExpressionStatements(): Array<
+    ExpressionStatement & { scope: Scope }
+  > {
+    const expressionStatements = this._recurseBodiesForType<
+      ExpressionStatement & { scope: Scope }
+    >("ExpressionStatement");
+    return expressionStatements;
   }
 
   private _recurseBodiesForType<T>(type: string): Array<T> {
@@ -40,7 +61,7 @@ export class Babeliser {
       return;
     }
     const matches = [];
-    if (typeof val === "object" && val !== null) {
+    if (val && typeof val === "object") {
       if (!Array.isArray(val)) {
         // @ts-ignore Force it.
         val.scope = scope;
