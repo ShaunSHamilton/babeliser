@@ -34,6 +34,7 @@ const complexType = {
 `;
 
 import {
+  assertArrowFunctionExpression,
   assertBinaryExpression,
   assertCallExpression,
   assertFunctionDeclaration,
@@ -44,8 +45,10 @@ import {
   assertMemberExpression,
   assertNumericLiteral,
   assertReturnStatement,
+  assertUpdateExpression,
   assertVariableDeclaration,
   assertVariableDeclarator,
+  UpdateExpression,
 } from "@babel/types";
 import { assert } from "chai";
 import { Babeliser } from "../src/index";
@@ -255,3 +258,29 @@ assertReturnStatement(returnStatement);
 const returnStatementArgument = returnStatement.argument;
 assertIdentifier(returnStatementArgument);
 assert.equal(returnStatementArgument.name, "tot");
+
+const subFunctionDeclaration = t.getFunctionDeclarations().find((f) => {
+  return f.id?.name === "sub";
+});
+assertFunctionDeclaration(subFunctionDeclaration);
+assert.equal(subFunctionDeclaration.async, true);
+
+// ARROW FUNCTION EXPRESSIONS
+
+assert.equal(t.getArrowFunctionExpressions().length, 2);
+
+const iIFEArrowFunctionExpression = t
+  .getArrowFunctionExpressions()
+  .find((a) => {
+    return a.scope.join() === "global,sub";
+  });
+assertArrowFunctionExpression(iIFEArrowFunctionExpression);
+
+// GENERIC TYPE HELPER
+
+const bUpdateExpression = t.getType<UpdateExpression>("UpdateExpression").pop();
+assertUpdateExpression(bUpdateExpression);
+assert.equal(bUpdateExpression.operator, "++");
+const bUpdateExpressionArgument = bUpdateExpression.argument;
+assertIdentifier(bUpdateExpressionArgument);
+assert.equal(bUpdateExpressionArgument.name, "b");

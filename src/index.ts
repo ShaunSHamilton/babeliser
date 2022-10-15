@@ -1,5 +1,6 @@
 import { parse, ParserOptions } from "@babel/parser";
 import {
+  ArrowFunctionExpression,
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
@@ -48,6 +49,15 @@ export class Babeliser {
       ImportDeclaration & { scope: Scope }
     >("ImportDeclaration");
     return expressionStatements;
+  }
+  public getArrowFunctionExpressions() {
+    const arrowFunctionDeclarations = this._recurseBodiesForType<
+      ArrowFunctionExpression & { scope: Scope }
+    >("ArrowFunctionExpression");
+    return arrowFunctionDeclarations;
+  }
+  public getType<T>(type: string) {
+    return this._recurseBodiesForType<T & { scope: Scope }>(type);
   }
 
   private _recurseBodiesForType<T>(type: string): Array<T> {
