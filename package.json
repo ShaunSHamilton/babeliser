@@ -4,14 +4,14 @@
     "url": "https://github.com/ShaunSHamilton/babeliser/issues"
   },
   "dependencies": {
-    "@babel/parser": "7.19.3"
+    "@babel/parser": "7.19.4"
   },
   "description": "A blazingly brilliant code parser for testing JavaScript code",
   "devDependencies": {
-    "@babel/types": "7.19.3",
+    "@babel/types": "7.19.4",
     "@types/chai": "4.3.3",
     "chai": "4.3.6",
-    "esbuild": "0.15.10",
+    "esbuild": "0.15.11",
     "typescript": "4.8.4"
   },
   "homepage": "https://github.com/ShaunSHamilton/babeliser#readme",
@@ -36,5 +36,5 @@
   },
   "type": "module",
   "types": "lib/index.d.ts",
-  "version": "0.1.0"
+  "version": "0.2.0"
 }

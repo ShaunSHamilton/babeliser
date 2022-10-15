@@ -19,30 +19,23 @@ export class Babeliser {
       ...options,
     });
   }
-
-  public getVariableDeclarations(): Array<
-    VariableDeclaration & { scope: Scope }
-  > {
-    const variableDeclarations = this._recurseBodiesForType<
-      VariableDeclaration & { scope: Scope }
-    >("VariableDeclaration");
-    return variableDeclarations;
+  public getArrowFunctionExpressions() {
+    const arrowFunctionDeclarations = this._recurseBodiesForType<
+      ArrowFunctionExpression & { scope: Scope }
+    >("ArrowFunctionExpression");
+    return arrowFunctionDeclarations;
   }
-  public getFunctionDeclarations(): Array<
-    FunctionDeclaration & { scope: Scope }
-  > {
-    const functionDeclarations = this._recurseBodiesForType<
-      FunctionDeclaration & { scope: Scope }
-    >("FunctionDeclaration");
-    return functionDeclarations;
-  }
-  public getExpressionStatements(): Array<
-    ExpressionStatement & { scope: Scope }
-  > {
+  public getExpressionStatements() {
     const expressionStatements = this._recurseBodiesForType<
       ExpressionStatement & { scope: Scope }
     >("ExpressionStatement");
     return expressionStatements;
+  }
+  public getFunctionDeclarations() {
+    const functionDeclarations = this._recurseBodiesForType<
+      FunctionDeclaration & { scope: Scope }
+    >("FunctionDeclaration");
+    return functionDeclarations;
   }
   public getImportDeclarations() {
     const expressionStatements = this._recurseBodiesForType<
@@ -50,12 +43,13 @@ export class Babeliser {
     >("ImportDeclaration");
     return expressionStatements;
   }
-  public getArrowFunctionExpressions() {
-    const arrowFunctionDeclarations = this._recurseBodiesForType<
-      ArrowFunctionExpression & { scope: Scope }
-    >("ArrowFunctionExpression");
-    return arrowFunctionDeclarations;
+  public getVariableDeclarations() {
+    const variableDeclarations = this._recurseBodiesForType<
+      VariableDeclaration & { scope: Scope }
+    >("VariableDeclaration");
+    return variableDeclarations;
   }
+
   public getType<T>(type: string) {
     return this._recurseBodiesForType<T & { scope: Scope }>(type);
   }
