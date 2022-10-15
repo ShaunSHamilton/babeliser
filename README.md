@@ -233,6 +233,7 @@ assert.equal(innerNumericLiteral.value, 24);
 ```javascript
 const bUpdateExpression = t.getType("UpdateExpression").pop();
 assert.equal(bUpdateExpression.operator, "++");
+assert.equal(bUpdateExpression.scope.join(), "global,sub");
 const bUpdateExpressionArgument = bUpdateExpression.argument;
 assert.equal(bUpdateExpressionArgument.name, "b");
 ```

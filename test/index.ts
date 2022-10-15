@@ -280,6 +280,7 @@ assertArrowFunctionExpression(iIFEArrowFunctionExpression);
 
 const bUpdateExpression = t.getType<UpdateExpression>("UpdateExpression").pop();
 assertUpdateExpression(bUpdateExpression);
+assert.equal(bUpdateExpression.scope.join(), "global,sub");
 assert.equal(bUpdateExpression.operator, "++");
 const bUpdateExpressionArgument = bUpdateExpression.argument;
 assertIdentifier(bUpdateExpressionArgument);

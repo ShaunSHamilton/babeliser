@@ -8,16 +8,23 @@ import {
   VariableDeclaration,
 } from "@babel/types";
 
+type BabeliserOptions = { maxScopeDepth: number };
 type Scope = Array<string>;
 
 export class Babeliser {
   public parsedCode: ReturnType<typeof parse>;
-
-  constructor(codeString: string, options?: ParserOptions) {
+  private maxScopeDepth = 4;
+  constructor(
+    codeString: string,
+    options?: Partial<ParserOptions & BabeliserOptions>
+  ) {
     this.parsedCode = parse(codeString, {
       sourceType: "module",
       ...options,
     });
+    if (options?.maxScopeDepth) {
+      this.maxScopeDepth = options.maxScopeDepth;
+    }
   }
   public getArrowFunctionExpressions() {
     const arrowFunctionDeclarations = this._recurseBodiesForType<
@@ -71,7 +78,7 @@ export class Babeliser {
     returnCondition: (...args: any) => boolean,
     scope: Array<string>
   ) {
-    if (scope.length >= 4) {
+    if (scope.length >= this.maxScopeDepth) {
       return;
     }
     const matches = [];
