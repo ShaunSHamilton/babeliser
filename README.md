@@ -52,7 +52,8 @@ const babelisedCode = new Babeliser(codeString);
 assert.equal(t.parsedCode.program.body.length, 7);
 ```
 
-### `getArrowFunctionExpressions`
+<details>
+  <summary><code>getArrowFunctionExpressions</code></summary>
 
 ```javascript
 assert.equal(t.getArrowFunctionExpressions().length, 2);
@@ -65,7 +66,10 @@ const iIFEArrowFunctionExpression = t
 assert.exists(iIFEArrowFunctionExpression);
 ```
 
-### `getExpressionStatements`
+</details>
+
+<details>
+  <summary><code>getExpressionStatements</code></summary>
 
 ```javascript
 assert.equal(t.getExpressionStatements().length, 4);
@@ -106,7 +110,10 @@ const addArgTwoIdentifier = addArguments[1];
 assert.equal(addArgTwoIdentifier.name, "b");
 ```
 
-### `getFunctionDeclarations`
+</details>
+
+<details>
+  <summary><code>getFunctionDeclarations</code></summary>
 
 ```javascript
 assert.equal(t.getFunctionDeclarations().length, 2);
@@ -144,7 +151,10 @@ const subFunctionDeclaration = t.getFunctionDeclarations().find((f) => {
 assert.equal(subFunctionDeclaration.async, true);
 ```
 
-### `getImportDeclarations`
+</details>
+
+<details>
+  <summary><code>getImportDeclarations</code></summary>
 
 ```javascript
 assert.equal(t.getImportDeclarations().length, 2);
@@ -168,7 +178,23 @@ const ySource = yImportDeclaration.source;
 assert.equal(ySource.value, "y");
 ```
 
-### `getVariableDeclarations`
+</details>
+
+<details>
+  <summary><code>getType</code></summary>
+
+```javascript
+const bUpdateExpression = t.getType("UpdateExpression").pop();
+assert.equal(bUpdateExpression.operator, "++");
+assert.equal(bUpdateExpression.scope.join(), "global,sub");
+const bUpdateExpressionArgument = bUpdateExpression.argument;
+assert.equal(bUpdateExpressionArgument.name, "b");
+```
+
+</details>
+
+<details>
+  <summary><code>getVariableDeclarations</code></summary>
 
 ```javascript
 assert.equal(t.getVariableDeclarations().length, 7);
@@ -228,12 +254,4 @@ const innerNumericLiteral = innerVariableDeclaration.declarations[0].init;
 assert.equal(innerNumericLiteral.value, 24);
 ```
 
-### `getType`
-
-```javascript
-const bUpdateExpression = t.getType("UpdateExpression").pop();
-assert.equal(bUpdateExpression.operator, "++");
-assert.equal(bUpdateExpression.scope.join(), "global,sub");
-const bUpdateExpressionArgument = bUpdateExpression.argument;
-assert.equal(bUpdateExpressionArgument.name, "b");
-```
+</details>

@@ -50,15 +50,14 @@ export class Babeliser {
     >("ImportDeclaration");
     return expressionStatements;
   }
+  public getType<T>(type: string) {
+    return this._recurseBodiesForType<T & { scope: Scope }>(type);
+  }
   public getVariableDeclarations() {
     const variableDeclarations = this._recurseBodiesForType<
       VariableDeclaration & { scope: Scope }
     >("VariableDeclaration");
     return variableDeclarations;
-  }
-
-  public getType<T>(type: string) {
-    return this._recurseBodiesForType<T & { scope: Scope }>(type);
   }
 
   private _recurseBodiesForType<T>(type: string): Array<T> {
