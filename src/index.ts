@@ -1,8 +1,9 @@
-import { parse } from "@babel/parser";
+import { parse, ParserOptions } from "@babel/parser";
 import {
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
+  ImportDeclaration,
   VariableDeclaration,
 } from "@babel/types";
 
@@ -11,8 +12,11 @@ type Scope = Array<string>;
 export class Babeliser {
   public parsedCode: ReturnType<typeof parse>;
 
-  constructor(codeString: string) {
-    this.parsedCode = parse(codeString);
+  constructor(codeString: string, options?: ParserOptions) {
+    this.parsedCode = parse(codeString, {
+      sourceType: "module",
+      ...options,
+    });
   }
 
   public getVariableDeclarations(): Array<
@@ -37,6 +41,12 @@ export class Babeliser {
     const expressionStatements = this._recurseBodiesForType<
       ExpressionStatement & { scope: Scope }
     >("ExpressionStatement");
+    return expressionStatements;
+  }
+  public getImportDeclarations() {
+    const expressionStatements = this._recurseBodiesForType<
+      ImportDeclaration & { scope: Scope }
+    >("ImportDeclaration");
     return expressionStatements;
   }
 

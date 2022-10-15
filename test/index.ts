@@ -1,15 +1,25 @@
 const jsString = `
+import z from "z";
+import { y } from "y";
+
 const a = 1;
 let b = 2;
 var c = 3;
 console.log(a + b + c);
-
+  
 function add(param1, param2) {
   const tot = param1 + param2;
+  let currentWeapon;
   return tot;
 }
-
+  
 add(a, b);
+
+async function sub(param1, param2) {
+  (() => {
+    b++;
+  })();
+}
 
 const complexType = {
   a: 1,
@@ -18,15 +28,19 @@ const complexType = {
     d: true,
   },
   e: () => {
-   const inner = 24;
+    const inner = 24;
   }
-}`;
+}
+`;
 
 import {
   assertBinaryExpression,
   assertCallExpression,
   assertFunctionDeclaration,
   assertIdentifier,
+  assertImportDeclaration,
+  assertImportDefaultSpecifier,
+  assertImportSpecifier,
   assertMemberExpression,
   assertNumericLiteral,
   assertReturnStatement,
@@ -38,9 +52,39 @@ import { Babeliser } from "../src/index";
 
 const t = new Babeliser(jsString);
 
-assert.equal(t.parsedCode.program.body.length, 7);
+assert.equal(t.parsedCode.program.body.length, 10);
 
-assert.equal(t.getVariableDeclarations().length, 6);
+// IMPORT DECLARATIONS
+
+assert.equal(t.getImportDeclarations().length, 2);
+
+const zImportDeclaration = t.getImportDeclarations().find((i) => {
+  return i.specifiers[0].local.name === "z";
+});
+assertImportDeclaration(zImportDeclaration);
+const zImportDefaultSpecifier = zImportDeclaration.specifiers[0];
+assertImportDefaultSpecifier(zImportDefaultSpecifier);
+const zSource = zImportDeclaration.source;
+assert.equal(zSource.value, "z");
+
+const yImportDeclaration = t.getImportDeclarations().find((i) => {
+  return i.specifiers[0].local.name === "y";
+});
+assertImportDeclaration(yImportDeclaration);
+const yImportSpecifier = yImportDeclaration.specifiers[0];
+assertImportSpecifier(yImportSpecifier);
+const yIdentifierLocal = yImportSpecifier.local;
+assertIdentifier(yIdentifierLocal);
+const yIdentifierImported = yImportSpecifier.imported;
+assertIdentifier(yIdentifierImported);
+assert.equal(yIdentifierLocal.name, "y");
+assert.equal(yIdentifierImported.name, "y");
+const ySource = yImportDeclaration.source;
+assert.equal(ySource.value, "y");
+
+// VARIABLE DECLARATIONS
+
+assert.equal(t.getVariableDeclarations().length, 7);
 assert.equal(
   t
     .getVariableDeclarations()
@@ -117,7 +161,7 @@ assert.equal(innerNumericLiteral.value, 24);
 
 // EXPRESSION STATEMENTS
 
-assert.equal(t.getExpressionStatements().length, 2);
+assert.equal(t.getExpressionStatements().length, 4);
 
 const consoleExpression = t.getExpressionStatements().find((e) => {
   const callExpression = e.expression;
@@ -133,17 +177,29 @@ const consoleExpression = t.getExpressionStatements().find((e) => {
 
 const consoleCallExpression = consoleExpression?.expression;
 assertCallExpression(consoleCallExpression);
-const binaryExpression = assertCallExpression.arguments[0];
-assert.equal(binaryExpression.left.left.name, "a");
-assert.equal(binaryExpression.left.right.name, "b");
-assert.equal(binaryExpression.right.name, "c");
+const binaryExpression = consoleCallExpression.arguments[0];
+assertBinaryExpression(binaryExpression);
+const binaryExpressionLeft = binaryExpression.left;
+assertBinaryExpression(binaryExpressionLeft);
+const binaryExpressionLeftLeft = binaryExpressionLeft.left;
+assertIdentifier(binaryExpressionLeftLeft);
+const binaryExpressionLeftRight = binaryExpressionLeft.right;
+assertIdentifier(binaryExpressionLeftRight);
+const binaryExpressionRight = binaryExpression.right;
+assertIdentifier(binaryExpressionRight);
+assert.equal(binaryExpressionLeftLeft.name, "a");
+assert.equal(binaryExpressionLeftRight.name, "b");
+assert.equal(binaryExpressionRight.name, "c");
 
 const addExpression = t.getExpressionStatements().find((e) => {
   const callExpression = e.expression;
   assertCallExpression(callExpression);
   const calleeIdentifier = callExpression.callee;
-  assertIdentifier(calleeIdentifier);
-  return calleeIdentifier.name === "add";
+  if (calleeIdentifier.type === "Identifier") {
+    assertIdentifier(calleeIdentifier);
+    return calleeIdentifier.name === "add";
+  }
+  return false;
 });
 const addCallExpression = addExpression?.expression;
 assertCallExpression(addCallExpression);
@@ -160,7 +216,7 @@ assert.equal(addArgTwoIdentifier.name, "b");
 
 // FUNCTION DECLARATIONS
 
-assert.equal(t.getFunctionDeclarations().length, 1);
+assert.equal(t.getFunctionDeclarations().length, 2);
 
 const addFunction = t.getFunctionDeclarations().find((f) => {
   return f.id?.name === "add";
