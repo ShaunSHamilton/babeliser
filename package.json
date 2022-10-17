@@ -3,9 +3,6 @@
   "bugs": {
     "url": "https://github.com/ShaunSHamilton/babeliser/issues"
   },
-  "dependencies": {
-    "@babel/parser": "7.19.4"
-  },
   "description": "A blazingly brilliant code parser for testing JavaScript code",
   "devDependencies": {
     "@babel/types": "7.19.4",
@@ -24,6 +21,9 @@
   "license": "MIT",
   "main": "./lib/index.js",
   "name": "babeliser",
+  "peerDependencies": {
+    "@babel/parser": "7.x"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ShaunSHamilton/babeliser.git"
