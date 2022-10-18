@@ -66,7 +66,7 @@ export class Babeliser {
   public getExpressionStatement(
     name: string,
     scope: Scope = ["global"]
-  ): ExpressionStatement | undefined {
+  ): (ExpressionStatement & { scope: Scope }) | undefined {
     const expressionStatements = this.getExpressionStatements().filter((a) =>
       this._isInScope(a.scope, scope)
     );
