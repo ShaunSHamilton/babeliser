@@ -1,10 +1,13 @@
 import { parse, ParserOptions } from "@babel/parser";
 import {
   ArrowFunctionExpression,
+  assertArrowFunctionExpression,
+  Expression,
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
   ImportDeclaration,
+  is,
   VariableDeclaration,
 } from "@babel/types";
 
@@ -60,6 +63,58 @@ export class Babeliser {
     return variableDeclarations;
   }
 
+  public getExpressionStatement(
+    name: string,
+    scope: Scope = ["global"]
+  ): ExpressionStatement | undefined {
+    const expressionStatements = this.getExpressionStatements().filter((a) =>
+      this._isInScope(a.scope, scope)
+    );
+    const expressionStatement = expressionStatements.find((e) => {
+      const expression = e.expression;
+      if (is("CallExpression", expression)) {
+        if (name.includes(".")) {
+          const [objectName, methodName] = name.split(".");
+          const memberExpression = expression.callee;
+          if (is("MemberExpression", memberExpression)) {
+            const object = memberExpression.object;
+            const property = memberExpression.property;
+            if (is("Identifier", object) && is("Identifier", property)) {
+              return object.name === objectName && property.name === methodName;
+            }
+          }
+        }
+        const identifier = expression.callee;
+        if (is("Identifier", identifier) && identifier.name === name) {
+          return true;
+        }
+      }
+      if (is("AwaitExpression", expression)) {
+        const callExpression = expression.argument;
+        if (is("CallExpression", callExpression)) {
+          const identifier = callExpression.callee;
+          if (is("Identifier", identifier)) {
+            return identifier.name === name;
+          }
+        }
+      }
+      return false;
+    });
+    return expressionStatement;
+  }
+
+  private _isInScope(scope: Scope, targetScope: Scope = ["global"]): boolean {
+    if (targetScope.length === 1 && targetScope[0] === "global") {
+      return true;
+    }
+    if (scope.length < targetScope.length) {
+      return false;
+    }
+    const scopeString = scope.join(".");
+    const targetScopeString = targetScope.join(".");
+    return scopeString.includes(targetScopeString);
+  }
+
   private _recurseBodiesForType<T>(type: string): Array<T> {
     const body = this.parsedCode.program.body;
     const types = [];
@@ -108,4 +163,18 @@ export class Babeliser {
     }
     return matches;
   }
+}
+
+function assertNot<T>(x: any, tString: string): x is T {
+  if (x.type === tString) {
+    return false;
+  }
+  return true;
+}
+
+function contains<T>(x: any, elem: string): x is T {
+  if (typeof x === "object") {
+    return Object.hasOwn(x, elem);
+  }
+  return false;
 }
