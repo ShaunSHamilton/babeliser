@@ -15,7 +15,7 @@
     "lib": ["ESNext", "DOM"],
     "target": "ES6",
     "module": "UMD",
-    "moduleResolution": "Node16"
+    "moduleResolution": "NodeNext"
   },
   "include": ["src"]
 }
