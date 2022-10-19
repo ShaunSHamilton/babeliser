@@ -33,11 +33,11 @@
   },
   "scripts": {
     "build": "esbuild --tsconfig=tsconfig.json --platform=neutral --main-fields=main --bundle --minify --outdir=lib src/index.ts && npx tsc",
-    "prepub": "npm run build",
+    "prepublish": "npm run build",
     "pub": "npm publish",
     "test": "esbuild --tsconfig=tsconfig.json --platform=neutral --external:@babel/parser --external:@babel/types --external:chai --bundle --external:logover --outdir=temp-test test/index.ts && mocha temp-test/index.js"
   },
   "type": "module",
   "types": "lib/index.d.ts",
-  "version": "0.4.0"
+  "version": "0.4.1"
 }
