@@ -1,4 +1,7 @@
 import { parse, ParserOptions } from "@babel/parser";
+// import * as generator from "@babel/generator";
+import { default as generate } from "@babel/generator";
+import { GeneratorOptions } from "babel__generator";
 import {
   ArrowFunctionExpression,
   assertArrowFunctionExpression,
@@ -8,6 +11,7 @@ import {
   Identifier,
   ImportDeclaration,
   is,
+  Node,
   VariableDeclaration,
 } from "@babel/types";
 
@@ -101,6 +105,12 @@ export class Babeliser {
       return false;
     });
     return expressionStatement;
+  }
+
+  public generateCode(ast: Node, options?: GeneratorOptions) {
+    // console.log(generator);
+    // return generator.default(ast, options).code;
+    return generate(ast, options).code;
   }
 
   private _isInScope(scope: Scope, targetScope: Scope = ["global"]): boolean {

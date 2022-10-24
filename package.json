@@ -6,6 +6,7 @@
   "description": "A blazingly brilliant code parser for testing JavaScript code",
   "devDependencies": {
     "@babel/types": "7.19.4",
+    "@types/babel__generator": "^7.6.4",
     "@types/chai": "4.3.3",
     "@types/mocha": "10.0.0",
     "chai": "4.3.6",
@@ -25,6 +26,7 @@
   "main": "./lib/index.js",
   "name": "babeliser",
   "peerDependencies": {
+    "@babel/generator": "7.x",
     "@babel/parser": "7.x"
   },
   "repository": {
@@ -35,7 +37,7 @@
     "build": "esbuild --tsconfig=tsconfig.json --platform=neutral --main-fields=main --bundle --minify --outdir=lib src/index.ts && npx tsc",
     "prepublish": "npm run build",
     "pub": "npm publish",
-    "test": "esbuild --tsconfig=tsconfig.json --platform=neutral --external:@babel/parser --external:@babel/types --external:chai --bundle --external:logover --outdir=temp-test test/index.ts && mocha temp-test/index.js"
+    "test": "esbuild --tsconfig=tsconfig.json --platform=neutral --external:@babel/parser --external:@babel/generator --external:@babel/types --external:chai --bundle --external:logover --outdir=temp-test test/index.ts && mocha temp-test/index.js"
   },
   "type": "module",
   "types": "lib/index.d.ts",

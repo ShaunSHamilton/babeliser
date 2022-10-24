@@ -59,6 +59,7 @@ import {
   assertArrowFunctionExpression,
   assertBinaryExpression,
   assertCallExpression,
+  assertExpressionStatement,
   assertFunctionDeclaration,
   assertIdentifier,
   assertIfStatement,
@@ -454,3 +455,29 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatement${
     });
   });
 });
+
+// generateCode
+
+describe(`${Ansi.Foreground + Colours.Yellow}generateCode${Ansi.Reset}`, () => {
+  it("should generate code", () => {
+    const addExpressionStatement = t.getExpressionStatement("add");
+    assertExpressionStatement(addExpressionStatement);
+    const code = t.generateCode(addExpressionStatement);
+    assert.equal(code, "add(a, b);");
+  });
+});
+
+// const s = `
+// async function main() {
+//   console.log("Saying 'hello' to a Solana account");
+// }`;
+// const a = new Babeliser(s);
+
+// const c = a.getExpressionStatement("console.log");
+// assert.exists(c, "You should have a `console.log` statement");
+// assert.equal(c?.scope?.join("."), "global.main");
+// assert.equal(
+//   c?.expression?.arguments?.[0]?.value,
+//   "Saying 'hello' to a Solana account",
+//   "You should have `console.log(\"Saying 'hello' to a Solana account\")`"
+// );
