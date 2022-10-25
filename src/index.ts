@@ -1,11 +1,7 @@
 import { parse, ParserOptions } from "@babel/parser";
-// import * as generator from "@babel/generator";
-import { default as generate } from "@babel/generator";
-import { GeneratorOptions } from "babel__generator";
+import generate, { GeneratorOptions } from "@babel/generator";
 import {
   ArrowFunctionExpression,
-  assertArrowFunctionExpression,
-  Expression,
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
@@ -13,10 +9,12 @@ import {
   is,
   Node,
   VariableDeclaration,
+  Statement,
 } from "@babel/types";
 
 type BabeliserOptions = { maxScopeDepth: number };
 type Scope = Array<string>;
+type ScopedStatement = Statement & { scope: Scope };
 
 export class Babeliser {
   public parsedCode: ReturnType<typeof parse>;
@@ -34,36 +32,33 @@ export class Babeliser {
     }
   }
   public getArrowFunctionExpressions() {
-    const arrowFunctionDeclarations = this._recurseBodiesForType<
-      ArrowFunctionExpression & { scope: Scope }
-    >("ArrowFunctionExpression");
+    const arrowFunctionDeclarations =
+      this._recurseBodiesForType<ArrowFunctionExpression>(
+        "ArrowFunctionExpression"
+      );
     return arrowFunctionDeclarations;
   }
   public getExpressionStatements() {
-    const expressionStatements = this._recurseBodiesForType<
-      ExpressionStatement & { scope: Scope }
-    >("ExpressionStatement");
+    const expressionStatements =
+      this._recurseBodiesForType<ExpressionStatement>("ExpressionStatement");
     return expressionStatements;
   }
   public getFunctionDeclarations() {
-    const functionDeclarations = this._recurseBodiesForType<
-      FunctionDeclaration & { scope: Scope }
-    >("FunctionDeclaration");
+    const functionDeclarations =
+      this._recurseBodiesForType<FunctionDeclaration>("FunctionDeclaration");
     return functionDeclarations;
   }
   public getImportDeclarations() {
-    const expressionStatements = this._recurseBodiesForType<
-      ImportDeclaration & { scope: Scope }
-    >("ImportDeclaration");
+    const expressionStatements =
+      this._recurseBodiesForType<ImportDeclaration>("ImportDeclaration");
     return expressionStatements;
   }
   public getType<T>(type: string) {
-    return this._recurseBodiesForType<T & { scope: Scope }>(type);
+    return this._recurseBodiesForType<T>(type);
   }
   public getVariableDeclarations() {
-    const variableDeclarations = this._recurseBodiesForType<
-      VariableDeclaration & { scope: Scope }
-    >("VariableDeclaration");
+    const variableDeclarations =
+      this._recurseBodiesForType<VariableDeclaration>("VariableDeclaration");
     return variableDeclarations;
   }
 
@@ -108,9 +103,7 @@ export class Babeliser {
   }
 
   public generateCode(ast: Node, options?: GeneratorOptions) {
-    // console.log(generator);
-    // return generator.default(ast, options).code;
-    return generate(ast, options).code;
+    return generate.default(ast, options).code;
   }
 
   private _isInScope(scope: Scope, targetScope: Scope = ["global"]): boolean {
@@ -125,11 +118,11 @@ export class Babeliser {
     return scopeString.includes(targetScopeString);
   }
 
-  private _recurseBodiesForType<T>(type: string): Array<T> {
+  private _recurseBodiesForType<T>(type: string): Array<T & { scope: Scope }> {
     const body = this.parsedCode.program.body;
     const types = [];
-    for (const bod of body) {
-      const a = this._recurse(bod, (a) => a?.type === type, ["global"]);
+    for (const statement of body) {
+      const a = this._recurse(statement, (a) => a?.type === type, ["global"]);
       if (a?.length) {
         types.push(...a);
       }
@@ -138,33 +131,34 @@ export class Babeliser {
   }
 
   private _recurse(
-    val: unknown,
-    returnCondition: (...args: any) => boolean,
+    // this is kind of a hack, since we're mutating val. It needs to be able to
+    // have a scope parameter, though it's never passed in with one.
+    val: Statement & { scope?: Scope },
+    isTargetType: (...args: any) => boolean,
     scope: Array<string>
-  ) {
+  ): ScopedStatement[] {
     if (scope.length >= this.maxScopeDepth) {
       return;
     }
     const matches = [];
     if (val && typeof val === "object") {
       if (!Array.isArray(val)) {
-        // @ts-ignore Force it.
         val.scope = scope;
       }
-      if (returnCondition(val)) {
+      if (isTargetType(val)) {
         matches.push(val);
       }
 
       let currentScope = [...scope];
-      const nearestIdentifier: undefined | Identifier = Object.entries(
-        val
-      ).find(([_k, v]) => v?.type === "Identifier")?.[1];
+      const nearestIdentifier: undefined | Identifier = Object.values(val).find(
+        (v) => v?.type === "Identifier"
+      );
       if (nearestIdentifier) {
         currentScope.push(nearestIdentifier.name);
       }
 
-      for (const [_k, v] of Object.entries(val)) {
-        const mat = this._recurse(v, returnCondition, currentScope);
+      for (const v of Object.values(val)) {
+        const mat = this._recurse(v, isTargetType, currentScope);
         const toPush = mat?.filter(Boolean).flat();
         if (toPush?.length) {
           matches.push(...toPush.flat());
@@ -173,18 +167,4 @@ export class Babeliser {
     }
     return matches;
   }
-}
-
-function assertNot<T>(x: any, tString: string): x is T {
-  if (x.type === tString) {
-    return false;
-  }
-  return true;
-}
-
-function contains<T>(x: any, elem: string): x is T {
-  if (typeof x === "object") {
-    return Object.hasOwn(x, elem);
-  }
-  return false;
 }
