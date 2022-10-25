@@ -1,11 +1,8 @@
 import { parse, ParserOptions } from "@babel/parser";
-// import * as generator from "@babel/generator";
 import { default as generate } from "@babel/generator";
 import { GeneratorOptions } from "babel__generator";
 import {
   ArrowFunctionExpression,
-  assertArrowFunctionExpression,
-  Expression,
   ExpressionStatement,
   FunctionDeclaration,
   Identifier,
@@ -175,16 +172,3 @@ export class Babeliser {
   }
 }
 
-function assertNot<T>(x: any, tString: string): x is T {
-  if (x.type === tString) {
-    return false;
-  }
-  return true;
-}
-
-function contains<T>(x: any, elem: string): x is T {
-  if (typeof x === "object") {
-    return Object.hasOwn(x, elem);
-  }
-  return false;
-}
