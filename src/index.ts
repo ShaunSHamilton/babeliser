@@ -9,10 +9,12 @@ import {
   is,
   Node,
   VariableDeclaration,
+  Statement
 } from "@babel/types";
 
 type BabeliserOptions = { maxScopeDepth: number };
 type Scope = Array<string>;
+type ScopedStatement = Statement & { scope: Scope };
 
 export class Babeliser {
   public parsedCode: ReturnType<typeof parse>;
@@ -119,8 +121,8 @@ export class Babeliser {
   private _recurseBodiesForType<T>(type: string): Array<T & { scope: Scope }> {
     const body = this.parsedCode.program.body;
     const types = [];
-    for (const bod of body) {
-      const a = this._recurse(bod, (a) => a?.type === type, ["global"]);
+    for (const statement of body) {
+      const a = this._recurse(statement, (a) => a?.type === type, ["global"]);
       if (a?.length) {
         types.push(...a);
       }
@@ -129,20 +131,21 @@ export class Babeliser {
   }
 
   private _recurse(
-    val: unknown,
-    returnCondition: (...args: any) => boolean,
+    // this is kind of a hack, since we're mutating val. It needs to be able to
+    // have a scope parameter, though it's never passed in with one.
+    val: Statement & { scope?: Scope },
+    isTargetType: (...args: any) => boolean,
     scope: Array<string>
-  ) {
+  ): ScopedStatement[] {
     if (scope.length >= this.maxScopeDepth) {
       return;
     }
     const matches = [];
     if (val && typeof val === "object") {
       if (!Array.isArray(val)) {
-        // @ts-ignore Force it.
         val.scope = scope;
       }
-      if (returnCondition(val)) {
+      if (isTargetType(val)) {
         matches.push(val);
       }
 
@@ -155,7 +158,7 @@ export class Babeliser {
       }
 
       for (const [_k, v] of Object.entries(val)) {
-        const mat = this._recurse(v, returnCondition, currentScope);
+        const mat = this._recurse(v, isTargetType, currentScope);
         const toPush = mat?.filter(Boolean).flat();
         if (toPush?.length) {
           matches.push(...toPush.flat());
