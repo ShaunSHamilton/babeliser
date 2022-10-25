@@ -9,7 +9,7 @@ import {
   is,
   Node,
   VariableDeclaration,
-  Statement
+  Statement,
 } from "@babel/types";
 
 type BabeliserOptions = { maxScopeDepth: number };
@@ -150,14 +150,14 @@ export class Babeliser {
       }
 
       let currentScope = [...scope];
-      const nearestIdentifier: undefined | Identifier = Object.entries(
-        val
-      ).find(([_k, v]) => v?.type === "Identifier")?.[1];
+      const nearestIdentifier: undefined | Identifier = Object.values(val).find(
+        (v) => v?.type === "Identifier"
+      );
       if (nearestIdentifier) {
         currentScope.push(nearestIdentifier.name);
       }
 
-      for (const [_k, v] of Object.entries(val)) {
+      for (const v of Object.values(val)) {
         const mat = this._recurse(v, isTargetType, currentScope);
         const toPush = mat?.filter(Boolean).flat();
         if (toPush?.length) {
