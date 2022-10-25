@@ -31,36 +31,33 @@ export class Babeliser {
     }
   }
   public getArrowFunctionExpressions() {
-    const arrowFunctionDeclarations = this._recurseBodiesForType<
-      ArrowFunctionExpression & { scope: Scope }
-    >("ArrowFunctionExpression");
+    const arrowFunctionDeclarations =
+      this._recurseBodiesForType<ArrowFunctionExpression>(
+        "ArrowFunctionExpression"
+      );
     return arrowFunctionDeclarations;
   }
   public getExpressionStatements() {
-    const expressionStatements = this._recurseBodiesForType<
-      ExpressionStatement & { scope: Scope }
-    >("ExpressionStatement");
+    const expressionStatements =
+      this._recurseBodiesForType<ExpressionStatement>("ExpressionStatement");
     return expressionStatements;
   }
   public getFunctionDeclarations() {
-    const functionDeclarations = this._recurseBodiesForType<
-      FunctionDeclaration & { scope: Scope }
-    >("FunctionDeclaration");
+    const functionDeclarations =
+      this._recurseBodiesForType<FunctionDeclaration>("FunctionDeclaration");
     return functionDeclarations;
   }
   public getImportDeclarations() {
-    const expressionStatements = this._recurseBodiesForType<
-      ImportDeclaration & { scope: Scope }
-    >("ImportDeclaration");
+    const expressionStatements =
+      this._recurseBodiesForType<ImportDeclaration>("ImportDeclaration");
     return expressionStatements;
   }
   public getType<T>(type: string) {
-    return this._recurseBodiesForType<T & { scope: Scope }>(type);
+    return this._recurseBodiesForType<T>(type);
   }
   public getVariableDeclarations() {
-    const variableDeclarations = this._recurseBodiesForType<
-      VariableDeclaration & { scope: Scope }
-    >("VariableDeclaration");
+    const variableDeclarations =
+      this._recurseBodiesForType<VariableDeclaration>("VariableDeclaration");
     return variableDeclarations;
   }
 
@@ -122,7 +119,7 @@ export class Babeliser {
     return scopeString.includes(targetScopeString);
   }
 
-  private _recurseBodiesForType<T>(type: string): Array<T> {
+  private _recurseBodiesForType<T>(type: string): Array<T & { scope: Scope }> {
     const body = this.parsedCode.program.body;
     const types = [];
     for (const bod of body) {
@@ -171,4 +168,3 @@ export class Babeliser {
     return matches;
   }
 }
-
