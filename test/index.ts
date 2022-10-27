@@ -35,7 +35,7 @@ const complexType = {
 }
 
 if (complexType.c?.d) {
-  complexType.e();
+  const q = complexType.e();
   throw new Error('error');
 } else if (complexType.a === a) {
   // Do nothing
@@ -73,7 +73,9 @@ import {
   assertUpdateExpression,
   assertVariableDeclaration,
   assertVariableDeclarator,
+  CallExpression,
   IfStatement,
+  is,
   UpdateExpression,
 } from "@babel/types";
 import { assert } from "chai";
@@ -131,7 +133,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
   Ansi.Reset
 }`, () => {
   it("should find all variable declarations", () => {
-    assert.equal(t.getVariableDeclarations().length, 8);
+    assert.equal(t.getVariableDeclarations().length, 9);
     assert.equal(
       t
         .getVariableDeclarations()
@@ -225,7 +227,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatements${
   Ansi.Reset
 }`, () => {
   it("should find all expression statements", () => {
-    assert.equal(t.getExpressionStatements().length, 7);
+    assert.equal(t.getExpressionStatements().length, 6);
   });
 
   it("console expression statement", () => {
@@ -467,17 +469,36 @@ describe(`${Ansi.Foreground + Colours.Yellow}generateCode${Ansi.Reset}`, () => {
   });
 });
 
-// const s = `
-// async function main() {
-//   console.log("Saying 'hello' to a Solana account");
-// }`;
-// const a = new Babeliser(s);
+describe(`${Ansi.Foreground + Colours.Yellow}.scope${Ansi.Reset}`, () => {
+  it("should return the scope", () => {
+    const addExpressionStatement = t.getExpressionStatement("add");
+    assertExpressionStatement(addExpressionStatement);
+    assert.equal(addExpressionStatement.scope.join(), "global");
+  });
+});
 
-// const c = a.getExpressionStatement("console.log");
-// assert.exists(c, "You should have a `console.log` statement");
-// assert.equal(c?.scope?.join("."), "global.main");
-// assert.equal(
-//   c?.expression?.arguments?.[0]?.value,
-//   "Saying 'hello' to a Solana account",
-//   "You should have `console.log(\"Saying 'hello' to a Solana account\")`"
-// );
+// getLineAndColumnFromIndex
+
+describe(`${Ansi.Foreground + Colours.Yellow}getLineAndColumnFromIndex${
+  Ansi.Reset
+}`, () => {
+  it("should return the line and column", () => {
+    const aVariableDeclaration = t.getVariableDeclarations().find((v) => {
+      const id = v.declarations?.[0]?.id;
+      assertIdentifier(id);
+      return id.name === "a";
+    });
+    assertVariableDeclaration(aVariableDeclaration);
+    const { start } = aVariableDeclaration;
+    assertNumber(start);
+    const lineAndColumn = t.getLineAndColumnFromIndex(start);
+    assertNumber(lineAndColumn.line);
+    assertNumber(lineAndColumn.column);
+    assert.equal(lineAndColumn.line, 5);
+    assert.equal(lineAndColumn.column, 0);
+  });
+});
+
+function assertNumber(n: unknown): asserts n is number {
+  assert.isNumber(n);
+}

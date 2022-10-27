@@ -19,6 +19,7 @@ type ScopedStatement = Statement & { scope: Scope };
 export class Babeliser {
   public parsedCode: ReturnType<typeof parse>;
   private maxScopeDepth = 4;
+  public codeString: string;
   constructor(
     codeString: string,
     options?: Partial<ParserOptions & BabeliserOptions>
@@ -30,6 +31,7 @@ export class Babeliser {
     if (options?.maxScopeDepth) {
       this.maxScopeDepth = options.maxScopeDepth;
     }
+    this.codeString = codeString;
   }
   public getArrowFunctionExpressions() {
     const arrowFunctionDeclarations =
@@ -104,6 +106,13 @@ export class Babeliser {
 
   public generateCode(ast: Node, options?: GeneratorOptions) {
     return generate.default(ast, options).code;
+  }
+
+  public getLineAndColumnFromIndex(index: number) {
+    const linesBeforeIndex = this.codeString.slice(0, index).split("\n");
+    const line = linesBeforeIndex.length;
+    const column = linesBeforeIndex.pop()?.length;
+    return { line, column };
   }
 
   private _isInScope(scope: Scope, targetScope: Scope = ["global"]): boolean {
