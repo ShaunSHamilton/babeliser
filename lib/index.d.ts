@@ -1,13 +1,12 @@
 import { parse, ParserOptions } from "@babel/parser";
 import { GeneratorOptions } from "@babel/generator";
 import { ArrowFunctionExpression, ExpressionStatement, FunctionDeclaration, ImportDeclaration, Node, VariableDeclaration } from "@babel/types";
-declare type BabeliserOptions = {
+type BabeliserOptions = {
     maxScopeDepth: number;
 };
-declare type Scope = Array<string>;
-export declare class Babeliser {
+type Scope = Array<string>;
+export class Babeliser {
     parsedCode: ReturnType<typeof parse>;
-    private maxScopeDepth;
     codeString: string;
     constructor(codeString: string, options?: Partial<ParserOptions & BabeliserOptions>);
     getArrowFunctionExpressions(): (ArrowFunctionExpression & {
@@ -36,9 +35,4 @@ export declare class Babeliser {
         line: number;
         column: number;
     };
-    private _isInScope;
-    private _recurseBodiesForType;
-    private _recurse;
 }
-export {};
-//# sourceMappingURL=index.d.ts.map

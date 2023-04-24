@@ -79,7 +79,7 @@ import {
   UpdateExpression,
 } from "@babel/types";
 import { assert } from "chai";
-import { Babeliser } from "../src/index";
+import { Babeliser } from "../src/index.ts";
 import { Ansi, Colours } from "logover";
 
 const t = new Babeliser(jsString);

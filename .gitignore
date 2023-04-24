@@ -1,2 +1,4 @@
 node_modules
 temp-test
+.parcel-cache
+.parcel-test-cache

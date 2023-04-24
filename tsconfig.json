@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
     // Generate d.ts files
     "declaration": true,
     // This compiler run should
