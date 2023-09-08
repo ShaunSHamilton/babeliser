@@ -79,7 +79,7 @@ import {
   UpdateExpression,
 } from "@babel/types";
 import { assert } from "chai";
-import { Babeliser } from "../src/index";
+import { Babeliser } from "../src/index.js";
 import { Ansi, Colours } from "logover";
 
 const t = new Babeliser(jsString);
@@ -364,20 +364,18 @@ describe(`${Ansi.Foreground + Colours.Yellow}getArrowFunctionExpressions${
 
 describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
   it("b update expression", () => {
-    const bUpdateExpression = t
-      .getType<UpdateExpression>("UpdateExpression")
-      .find((u) => {
-        const updateExpressionArgument = u.argument;
-        assertIdentifier(updateExpressionArgument);
-        return updateExpressionArgument.name === "b";
-      });
+    const bUpdateExpression = t.getType("UpdateExpression").find((u) => {
+      const updateExpressionArgument = u.argument;
+      assertIdentifier(updateExpressionArgument);
+      return updateExpressionArgument.name === "b";
+    });
     assertUpdateExpression(bUpdateExpression);
     assert.equal(bUpdateExpression.scope.join(), "global,sub");
     assert.equal(bUpdateExpression.operator, "++");
   });
 
   describe("if statement", () => {
-    const ifStatement = t.getType<IfStatement>("IfStatement")[0];
+    const ifStatement = t.getType("IfStatement")[0];
     it("exists", () => {
       assertIfStatement(ifStatement);
       assert.exists(ifStatement);
@@ -499,6 +497,6 @@ describe(`${Ansi.Foreground + Colours.Yellow}getLineAndColumnFromIndex${
   });
 });
 
-function assertNumber(n: unknown): asserts n is number {
+function assertNumber(n) {
   assert.isNumber(n);
 }
