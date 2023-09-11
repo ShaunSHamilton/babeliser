@@ -79,13 +79,14 @@ import {
   UpdateExpression,
 } from "@babel/types";
 import { assert } from "chai";
+import { test, describe } from "bun:test";
 import { Babeliser } from "../src/index";
 import { Ansi, Colours } from "logover";
 
 const t = new Babeliser(jsString);
 
 describe("Babeliser", () => {
-  it("should correctly parse the fixture code", () => {
+  test("should correctly parse the fixture code", () => {
     assert.equal(t.parsedCode.program.body.length, 13);
   });
 });
@@ -95,11 +96,11 @@ describe("Babeliser", () => {
 describe(`${Ansi.Foreground + Colours.Yellow}getImportDeclarations${
   Ansi.Reset
 }`, () => {
-  it("should find all import declarations", () => {
+  test("should find all import declarations", () => {
     assert.equal(t.getImportDeclarations().length, 2);
   });
 
-  it("z import declaration", () => {
+  test("z import declaration", () => {
     const zImportDeclaration = t.getImportDeclarations().find((i) => {
       return i.specifiers[0].local.name === "z";
     });
@@ -110,7 +111,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getImportDeclarations${
     assert.equal(zSource.value, "z");
   });
 
-  it("y import declaration", () => {
+  test("y import declaration", () => {
     const yImportDeclaration = t.getImportDeclarations().find((i) => {
       return i.specifiers[0].local.name === "y";
     });
@@ -132,7 +133,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getImportDeclarations${
 describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
   Ansi.Reset
 }`, () => {
-  it("should find all variable declarations", () => {
+  test("should find all variable declarations", () => {
     assert.equal(t.getVariableDeclarations().length, 9);
     assert.equal(
       t
@@ -142,7 +143,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
     );
   });
 
-  it("a variable declaration", () => {
+  test("a variable declaration", () => {
     const aVariableDeclaration = t.getVariableDeclarations().find((v) => {
       const variableDeclarator = v.declarations[0];
       assertVariableDeclarator(variableDeclarator);
@@ -158,7 +159,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
     assert.equal(aNumericLiteral.value, 1);
   });
 
-  it("b variable declaration", () => {
+  test("b variable declaration", () => {
     const bVariableDeclaration = t.getVariableDeclarations().find((v) => {
       const variableDeclarator = v.declarations[0];
       assertVariableDeclarator(variableDeclarator);
@@ -174,7 +175,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
     assert.equal(bNumericLiteral.value, 2);
   });
 
-  it("c variable declaration", () => {
+  test("c variable declaration", () => {
     const cVariableDeclaration = t.getVariableDeclarations().find((v) => {
       const variableDeclarator = v.declarations[0];
       assertVariableDeclarator(variableDeclarator);
@@ -190,7 +191,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
     assert.equal(cNumericLiteral.value, 3);
   });
 
-  it("complexType variable declaration", () => {
+  test("complexType variable declaration", () => {
     const complexTypeVariableDeclaration = t
       .getVariableDeclarations()
       .find((v) => {
@@ -204,7 +205,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
     assert.equal(complexTypeVariableDeclaration.kind, "const");
     assert.equal(complexTypeVariableDeclaration.scope.join(), "global");
   });
-  it("inner variable declaration", () => {
+  test("inner variable declaration", () => {
     const innerVariableDeclaration = t.getVariableDeclarations().find((v) => {
       const variableDeclarator = v.declarations[0];
       assertVariableDeclarator(variableDeclarator);
@@ -226,11 +227,11 @@ describe(`${Ansi.Foreground + Colours.Yellow}getVariableDeclarations${
 describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatements${
   Ansi.Reset
 }`, () => {
-  it("should find all expression statements", () => {
+  test("should find all expression statements", () => {
     assert.equal(t.getExpressionStatements().length, 6);
   });
 
-  it("console expression statement", () => {
+  test("console expression statement", () => {
     const consoleExpression = t.getExpressionStatements().find((e) => {
       const callExpression = e.expression;
       assertCallExpression(callExpression);
@@ -260,7 +261,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatements${
     assert.equal(binaryExpressionRight.name, "c");
   });
 
-  it("add expression statement", () => {
+  test("add expression statement", () => {
     const addExpression = t.getExpressionStatements().find((e) => {
       const callExpression = e.expression;
       assertCallExpression(callExpression);
@@ -290,11 +291,11 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatements${
 describe(`${Ansi.Foreground + Colours.Yellow}getFunctionDeclarations${
   Ansi.Reset
 }`, () => {
-  it("should find all function declarations", () => {
+  test("should find all function declarations", () => {
     assert.equal(t.getFunctionDeclarations().length, 2);
   });
 
-  it("add function declaration", () => {
+  test("add function declaration", () => {
     const addFunction = t.getFunctionDeclarations().find((f) => {
       return f.id?.name === "add";
     });
@@ -334,7 +335,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getFunctionDeclarations${
     assert.equal(returnStatementArgument.name, "tot");
   });
 
-  it("sub function declaration", () => {
+  test("sub function declaration", () => {
     const subFunctionDeclaration = t.getFunctionDeclarations().find((f) => {
       return f.id?.name === "sub";
     });
@@ -347,11 +348,11 @@ describe(`${Ansi.Foreground + Colours.Yellow}getFunctionDeclarations${
 describe(`${Ansi.Foreground + Colours.Yellow}getArrowFunctionExpressions${
   Ansi.Reset
 }`, () => {
-  it("should find all arrow function expressions", () => {
+  test("should find all arrow function expressions", () => {
     assert.equal(t.getArrowFunctionExpressions().length, 2);
   });
 
-  it("IIFE arrow function expression", () => {
+  test("IIFE arrow function expression", () => {
     const iIFEArrowFunctionExpression = t
       .getArrowFunctionExpressions()
       .find((a) => {
@@ -363,7 +364,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getArrowFunctionExpressions${
 // GENERIC TYPE HELPER
 
 describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
-  it("b update expression", () => {
+  test("b update expression", () => {
     const bUpdateExpression = t
       .getType<UpdateExpression>("UpdateExpression")
       .find((u) => {
@@ -378,14 +379,14 @@ describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
 
   describe("if statement", () => {
     const ifStatement = t.getType<IfStatement>("IfStatement")[0];
-    it("exists", () => {
+    test("exists", () => {
       assertIfStatement(ifStatement);
       assert.exists(ifStatement);
     });
     describe(`${Ansi.Foreground + Colours.Blue}.test${Ansi.Reset}`, () => {
       const optionalMemberExpression = ifStatement.test;
       assertOptionalMemberExpression(optionalMemberExpression);
-      it("is optional", () => {
+      test("is optional", () => {
         assert.isTrue(optionalMemberExpression.optional);
       });
       describe(`${Ansi.Foreground + Colours.Blue}.object${Ansi.Reset}`, () => {
@@ -397,7 +398,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
         }`, () => {
           const objectIdentifier = memberExpression.object;
           assertIdentifier(objectIdentifier);
-          it("complexType", () => {
+          test("complexType", () => {
             assert.equal(objectIdentifier.name, "complexType");
           });
         });
@@ -407,7 +408,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
         }`, () => {
           const propertyIdentifier = memberExpression.property;
           assertIdentifier(propertyIdentifier);
-          it("c", () => {
+          test("c", () => {
             assert.equal(propertyIdentifier.name, "c");
           });
         });
@@ -416,7 +417,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getType${Ansi.Reset}`, () => {
         Ansi.Reset
       }`, () => {
         const propertyIdentifier = optionalMemberExpression.property;
-        it("exists", () => {
+        test("exists", () => {
           assertIdentifier(propertyIdentifier);
           assert.exists(propertyIdentifier);
         });
@@ -440,19 +441,19 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatement${
 }`, () => {
   describe(`${Ansi.Foreground + Colours.Red}console.log${Ansi.Reset}`, () => {
     const consoleExpressionStatement = t.getExpressionStatement("console.log");
-    it("exists", () => {
+    test("exists", () => {
       assert.exists(consoleExpressionStatement);
     });
   });
   describe(`${Ansi.Foreground + Colours.Red}add${Ansi.Reset}`, () => {
     const addExpressionStatement = t.getExpressionStatement("add");
-    it("exists", () => {
+    test("exists", () => {
       assert.exists(addExpressionStatement);
     });
   });
   describe(`${Ansi.Foreground + Colours.Red}sub${Ansi.Reset}`, () => {
     const subExpressionStatement = t.getExpressionStatement("sub");
-    it("exists", () => {
+    test("exists", () => {
       assert.exists(subExpressionStatement);
     });
   });
@@ -461,7 +462,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}getExpressionStatement${
 // generateCode
 
 describe(`${Ansi.Foreground + Colours.Yellow}generateCode${Ansi.Reset}`, () => {
-  it("should generate code", () => {
+  test("should generate code", () => {
     const addExpressionStatement = t.getExpressionStatement("add");
     assertExpressionStatement(addExpressionStatement);
     const code = t.generateCode(addExpressionStatement);
@@ -470,7 +471,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}generateCode${Ansi.Reset}`, () => {
 });
 
 describe(`${Ansi.Foreground + Colours.Yellow}.scope${Ansi.Reset}`, () => {
-  it("should return the scope", () => {
+  test("should return the scope", () => {
     const addExpressionStatement = t.getExpressionStatement("add");
     assertExpressionStatement(addExpressionStatement);
     assert.equal(addExpressionStatement.scope.join(), "global");
@@ -482,7 +483,7 @@ describe(`${Ansi.Foreground + Colours.Yellow}.scope${Ansi.Reset}`, () => {
 describe(`${Ansi.Foreground + Colours.Yellow}getLineAndColumnFromIndex${
   Ansi.Reset
 }`, () => {
-  it("should return the line and column", () => {
+  test("should return the line and column", () => {
     const aVariableDeclaration = t.getVariableDeclarations().find((v) => {
       const id = v.declarations?.[0]?.id;
       assertIdentifier(id);
