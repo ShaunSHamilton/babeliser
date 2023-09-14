@@ -105,7 +105,7 @@ export class Babeliser {
   }
 
   public generateCode(ast: Node, options?: GeneratorOptions) {
-    return generate.default(ast, options).code;
+    return generate(ast, options).code;
   }
 
   public getLineAndColumnFromIndex(index: number) {
@@ -136,6 +136,7 @@ export class Babeliser {
         types.push(...a);
       }
     }
+    // @ts-ignore There is no easy way to type this without writing out constraining to the 40+ types
     return types;
   }
 
@@ -146,15 +147,16 @@ export class Babeliser {
     isTargetType: (...args: any) => boolean,
     scope: Array<string>
   ): ScopedStatement[] {
+    const matches: ScopedStatement[] = [];
     if (scope.length >= this.maxScopeDepth) {
-      return;
+      return matches;
     }
-    const matches = [];
     if (val && typeof val === "object") {
       if (!Array.isArray(val)) {
         val.scope = scope;
       }
       if (isTargetType(val)) {
+        // @ts-ignore See `val` parameter
         matches.push(val);
       }
 
@@ -174,6 +176,8 @@ export class Babeliser {
         }
       }
     }
+
+    // @ts-ignore See `val` parameter
     return matches;
   }
 }

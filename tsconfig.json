@@ -1,21 +1,30 @@
 {
   "compilerOptions": {
-    // Generate d.ts files
+    // add Bun type definitions
+    "types": ["bun-types"],
+
+    // enable latest features
+    "lib": ["esnext"],
+    "module": "esnext",
+    "target": "esnext",
+
+    // if TS 5.x+
+    "moduleResolution": "bundler",
+    // "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "moduleDetection": "force",
+
+    "jsx": "react-jsx", // support JSX
+    "allowJs": true, // allow importing `.js` from `.ts`
+    "esModuleInterop": true, // allow default imports for CommonJS modules
+
+    // best practices
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
     "declaration": true,
-    // This compiler run should
-    // only output d.ts files
-    "emitDeclarationOnly": true,
-    // Types should go into this directory.
-    // Removing this would place the .d.ts files
-    // next to the .js files
-    "outDir": "lib",
-    // go to js file when using IDE functions like
-    // "Go to Definition" in VSCode
-    "declarationMap": true,
-    "lib": ["ESNext", "DOM"],
-    "target": "ES6",
-    "module": "UMD",
-    "moduleResolution": "NodeNext"
+    "declarationDir": "lib",
+    "emitDeclarationOnly": true
   },
-  "include": ["src"]
+  "include": ["src/**/*"]
 }

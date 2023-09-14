@@ -5,15 +5,12 @@
   },
   "description": "A blazingly brilliant code parser for testing JavaScript code",
   "devDependencies": {
-    "@babel/types": "7.19.4",
+    "@babel/types": "^7.22.17",
     "@types/babel__generator": "7.6.4",
     "@types/chai": "4.3.3",
-    "@types/mocha": "10.0.0",
+    "bun-types": "^1.0.1",
     "chai": "4.3.6",
-    "esbuild": "0.15.11",
-    "logover": "2.0.0",
-    "mocha": "10.1.0",
-    "typescript": "4.8.4"
+    "logover": "2.0.0"
   },
   "homepage": "https://github.com/ShaunSHamilton/babeliser#readme",
   "keywords": [
@@ -34,12 +31,12 @@
     "url": "git+https://github.com/ShaunSHamilton/babeliser.git"
   },
   "scripts": {
-    "build": "esbuild --tsconfig=tsconfig.json --platform=neutral --main-fields=main --bundle --minify --outdir=lib src/index.ts && npx tsc",
+    "build": "bun build src/index.ts --outdir lib --external @babel/generator --external @babel/parser --external @babel/types --minify --sourcemap=external",
+    "prebuild": "tsc",
     "prepub": "npm run build",
-    "pub": "npm publish",
-    "test": "esbuild --tsconfig=tsconfig.json --platform=neutral --external:@babel/parser --external:@babel/generator --external:@babel/types --external:chai --bundle --external:logover --outdir=temp-test test/index.ts && mocha temp-test/index.js"
+    "pub": "npm publish"
   },
   "type": "module",
   "types": "lib/index.d.ts",
-  "version": "0.6.0"
+  "version": "0.7.0"
 }

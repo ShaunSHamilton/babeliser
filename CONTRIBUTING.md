@@ -2,11 +2,13 @@
 
 ## Local Development
 
+This project uses [Bun](https://bun.sh/). Install it for your machine, and run `bun install` to install all dependencies.
+
 ### Tests
 
 Tests are written using Chai.js assertions in the [`test/`](test/) directory.
 
-To run the tests, run `npm test`.
+To run the tests, run `bun test`.
 
 ## Repo Practices
 
